@@ -11,6 +11,7 @@ uvicorn app.main:app --reload
 
 Then open http://127.0.0.1:8000
 
+
 ## Project Structure
 fastapi-task-automation/
 ├── app/
@@ -20,3 +21,19 @@ fastapi-task-automation/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+
+## Dependencies
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+python-dotenv
+pydantic
+
+## License
+MIT License
+## Author
+Suleiman Khasheboun
+## Contact
+suli.tempmail2022@gmail.com
+
