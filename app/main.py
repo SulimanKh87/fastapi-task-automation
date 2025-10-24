@@ -1,3 +1,4 @@
+""" Main application file for FastAPI Task Automation project. """
 from fastapi import FastAPI
 
 app = FastAPI(title='FastAPI Task Automation')
