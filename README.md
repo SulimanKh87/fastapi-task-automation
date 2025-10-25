@@ -43,11 +43,11 @@ http://127.0.0.1:8000/docs
 
 ```mermaid
 flowchart TD
-    A[Client UI<br>(Browser / Postman / CLI)] --> B[FastAPI Application<br>(app/main.py + Routes)]
-    B --> C[Business Logic Layer<br>(CRUD, Services, Auth)]
-    C --> D[Database Layer<br>(SQLAlchemy + PostgreSQL)]
-    C --> E[Async Worker<br>(Celery + Redis Queue)]
-    E --> F[CI/CD Pipeline<br>(Docker + GitHub Actions)]
+    A[Client UI\n(Browser / Postman / CLI)] --> B[FastAPI Application\n(app/main.py + Routes)]
+    B --> C[Business Logic Layer\n(CRUD, Services, Auth)]
+    C --> D[Database Layer\n(SQLAlchemy + PostgreSQL)]
+    C --> E[Async Worker\n(Celery + Redis Queue)]
+    E --> F[CI/CD Pipeline\n(Docker + GitHub Actions)]
     D --> F
 ```
 
