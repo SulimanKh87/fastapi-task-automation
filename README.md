@@ -43,12 +43,13 @@ http://127.0.0.1:8000/docs
 
 ```mermaid
 flowchart TD
-    A[Client UI\n(Browser / Postman / CLI)] --> B[FastAPI Application\n(app/main.py + Routes)]
-    B --> C[Business Logic Layer\n(CRUD, Services, Auth)]
-    C --> D[Database Layer\n(SQLAlchemy + PostgreSQL)]
-    C --> E[Async Worker\n(Celery + Redis Queue)]
-    E --> F[CI/CD Pipeline\n(Docker + GitHub Actions)]
+    A["Client UI (Browser / Postman / CLI)"] --> B["FastAPI Application (app/main.py + Routes)"]
+    B --> C["Business Logic Layer (CRUD, Services, Auth)"]
+    C --> D["Database Layer (SQLAlchemy + PostgreSQL)"]
+    C --> E["Async Worker (Celery + Redis Queue)"]
+    E --> F["CI/CD Pipeline (Docker + GitHub Actions)"]
     D --> F
+
 ```
 
 **Key Components**
@@ -57,7 +58,7 @@ flowchart TD
 - **Celery + Redis** — asynchronous background task queue
 - **Docker + GitHub Actions** — containerization & CI/CD automation
 - **Pytest** — testing & coverage for backend logic
-- 
+
 ```markdown
 ## API Workflow Overview
 ```mermaid
