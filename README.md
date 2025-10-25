@@ -13,7 +13,43 @@ Goal: create the base FastAPI project structure, set up a virtual environment, i
 - Verified server runs on http://127.0.0.1:8000  
 
 ---
+## Day 2 — Database Integration (PostgreSQL + SQLAlchemy + Alembic)
 
+### Goal
+Integrate a production-ready relational database layer using Dockerized PostgreSQL, SQLAlchemy ORM, and Alembic migrations.
+
+### Achievements
+- 🐘 Deployed PostgreSQL 16 inside Docker (`pg-fastapi` container with volume `pgdata_fastapi`)
+- 🔗 Configured `.env` with `DATABASE_URL` for dynamic connection management
+- 🧩 Added `app/database.py` to handle SQLAlchemy engine, session factory, and Base class
+- 📦 Implemented `app/models.py` with `Task` ORM model
+- 🧠 Created Pydantic schemas in `app/schemas.py` for request/response validation
+- 🛠️ Added CRUD logic (`app/crud.py`) and modular router (`app/routers/tasks.py`)
+- 🚀 Updated `app/main.py` to register routers and initialize the FastAPI app
+- ⚙️ Initialized **Alembic** for schema versioning  
+  - Configured `alembic.ini` and dynamic `.env` loading in `alembic/env.py`
+  - Generated first migration: `create tasks table`
+  - Applied migration via `alembic upgrade head`  
+- ✅ Verified connectivity with Dockerized PostgreSQL container on port 5433
+
+### Quick Reference Commands
+```bash
+# Run PostgreSQL in Docker (persistent volume)
+docker run --name pg-fastapi \
+  -e POSTGRES_USER=task_user \
+  -e POSTGRES_PASSWORD=task_pass \
+  -e POSTGRES_DB=task_db \
+  -p 5433:5432 \
+  -v pgdata_fastapi:/var/lib/postgresql/data \
+  -d postgres:16
+
+# Apply database migrations
+alembic revision --autogenerate -m "create tasks table"
+alembic upgrade head
+
+# Start the FastAPI server
+uvicorn app.main:app --reload
+---
 ## Quick Start
 
 ```bash
@@ -89,16 +125,20 @@ FastAPI returns a JSON response to the client
 ```markdown
 ## Project Structure
 ```
-```mermaid
 graph TD
     A[fastapi-task-automation/] --> B[app/]
     B --> C[__init__.py]
     B --> D[main.py]
-    A --> E[requirements.txt]
-    A --> F[.gitignore]
-    A --> G[README.md]
-    A --> H[venv/]
-```
+    B --> E[database.py]
+    B --> F[models.py]
+    B --> G[schemas.py]
+    B --> H[crud.py]
+    B --> I[routers/tasks.py]
+    A --> J[alembic.ini]
+    A --> K[alembic/]
+    A --> L[.env]
+    A --> M[requirements.txt]
+
 ## Dependencies
 fastapi
 uvicorn
