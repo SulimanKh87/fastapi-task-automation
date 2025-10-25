@@ -40,41 +40,16 @@ http://127.0.0.1:8000/docs
  → Swagger UI (auto docs)
 
 ## System Architecture
-The system is designed as a microservice architecture using FastAPI for building the API endpoints. It leverages SQLAlchemy for database interactions and uses PostgreSQL as the database backend. The application is containerized using virtualenv for dependency management.
-                 ┌──────────────────────────┐
-                 │        Client UI         │
-                 │ (Browser / Postman / CLI)│
-                 └────────────┬─────────────┘
-                              │  HTTP Request
-                              ▼
-                 ┌──────────────────────────┐
-                 │        FastAPI App       │
-                 │  (app/main.py, routes)   │
-                 └────────────┬─────────────┘
-                              │  Calls
-                              ▼
-                 ┌──────────────────────────┐
-                 │     Business Logic       │
-                 │ (CRUD, Services, Auth)   │
-                 └────────────┬─────────────┘
-                              │  Uses ORM
-                              ▼
-                 ┌──────────────────────────┐
-                 │     Database Layer       │
-                 │ (SQLAlchemy + Postgres)  │
-                 └────────────┬─────────────┘
-                              │  Async Tasks
-                              ▼
-                 ┌──────────────────────────┐
-                 │   Celery + Redis Queue   │
-                 │ (Background Processing)  │
-                 └────────────┬─────────────┘
-                              │  CI/CD Pipeline
-                              ▼
-                 ┌──────────────────────────┐
-                 │   Docker + GitHub CI/CD  │
-                 │ (Build, Test, Deploy)    │
-                 └──────────────────────────┘
+
+```mermaid
+flowchart TD
+    A[Client UI<br>(Browser / Postman / CLI)] --> B[FastAPI Application<br>(app/main.py + Routes)]
+    B --> C[Business Logic Layer<br>(CRUD, Services, Auth)]
+    C --> D[Database Layer<br>(SQLAlchemy + PostgreSQL)]
+    C --> E[Async Worker<br>(Celery + Redis Queue)]
+    E --> F[CI/CD Pipeline<br>(Docker + GitHub Actions)]
+    D --> F
+```
 
 **Key Components**
 - **FastAPI** — REST API framework (main entry point)
@@ -82,42 +57,26 @@ The system is designed as a microservice architecture using FastAPI for building
 - **Celery + Redis** — asynchronous background task queue
 - **Docker + GitHub Actions** — containerization & CI/CD automation
 - **Pytest** — testing & coverage for backend logic
+- 
+```markdown
+## API Workflow Overview
+```mermaid
+sequenceDiagram
+    participant Client
+    participant FastAPI
+    participant Logic
+    participant DB
+    participant Worker
 
-🔄 API Workflow Overview
-        ┌────────────────────────┐
-        │      Client Side       │
-        │ (Browser / Postman)    │
-        └──────────┬─────────────┘
-                   │ HTTP Request (JSON)
-                   ▼
-        ┌────────────────────────┐
-        │      FastAPI App       │
-        │  (app/main.py routes)  │
-        └──────────┬─────────────┘
-                   │ Validates data via Pydantic
-                   ▼
-        ┌────────────────────────┐
-        │   Business Logic Layer │
-        │ (CRUD ops in crud.py)  │
-        └──────────┬─────────────┘
-                   │ ORM Queries
-                   ▼
-        ┌────────────────────────┐
-        │    Database Layer      │
-        │ (SQLAlchemy + Postgres)│
-        └──────────┬─────────────┘
-                   │ Optional background jobs
-                   ▼
-        ┌────────────────────────┐
-        │ Celery + Redis Workers │
-        │ (Async task queue)     │
-        └──────────┬─────────────┘
-                   │ Sends result to API
-                   ▼
-        ┌────────────────────────┐
-        │     API Response       │
-        │ (JSON → Client)        │
-        └────────────────────────┘
+    Client->>FastAPI: Send HTTP Request (JSON)
+    FastAPI->>Logic: Validate Input (Pydantic)
+    Logic->>DB: Perform CRUD Operation (SQLAlchemy)
+    Logic->>Worker: Dispatch Async Job (Celery)
+    Worker-->>Logic: Return Job Result
+    DB-->>Logic: Confirm Data Stored
+    Logic-->>FastAPI: Return Response Object
+    FastAPI-->>Client: JSON Response
+```        
 🧠 Workflow Summary
 Client sends an HTTP request (e.g., POST /tasks)
 FastAPI receives → validates via Pydantic Schemas
@@ -126,16 +85,19 @@ Celery Worker performs async jobs if needed
 Database stores data (PostgreSQL engine)
 FastAPI returns a JSON response to the client
 
+```markdown
 ## Project Structure
-fastapi-task-automation/
-├── app/
-│   ├── __init__.py
-│   └── main.py
-├── venv/
-├── requirements.txt
-├── .gitignore
-└── README.md
-
+```
+```mermaid
+graph TD
+    A[fastapi-task-automation/] --> B[app/]
+    B --> C[__init__.py]
+    B --> D[main.py]
+    A --> E[requirements.txt]
+    A --> F[.gitignore]
+    A --> G[README.md]
+    A --> H[venv/]
+```
 ## Dependencies
 fastapi
 uvicorn
