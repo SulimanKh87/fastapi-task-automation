@@ -32,6 +32,23 @@ Integrate a production-ready relational database layer using Dockerized PostgreS
   - Applied migration via `alembic upgrade head`  
 - ✅ Verified connectivity with Dockerized PostgreSQL container on port 5433
 
+## Day 3 — Docker Compose Enhancements & Production Readiness
+
+### Goal
+Containerize the full application stack and make it production-grade with automatic migrations, persistent volumes, healthchecks, and a visual database interface.
+
+### Achievements
+- 🐳 **Docker Compose setup:** runs FastAPI, PostgreSQL v16, and pgAdmin in a single command  
+- 🧩 **Persistent volume:** database data stored safely in `fastapi-task-automation_pg_data` (survives restarts)  
+- ⚙️ **Automated Alembic migrations:** via `start.sh` script executed on container startup  
+- 💚 **Healthchecks:** PostgreSQL service validated with `pg_isready` before FastAPI starts  
+- 🔒 **Secure `.env` loading:** all secrets (DB URL, pgAdmin login) moved to `.env`, excluded from Git  
+- 🪵 **Logging & restart policy:** prevents log overflow and auto-restores crashed containers  
+- 🧠 **pgAdmin UI:** visual PostgreSQL management on [http://127.0.0.1:5050](http://127.0.0.1:5050)  
+  - Email → `${PGADMIN_DEFAULT_EMAIL}`  
+  - Password → `${PGADMIN_DEFAULT_PASSWORD}`  
+  - Connect host → `pg-fastapi`, port `5432`
+  
 ### Quick Reference Commands
 ```bash
 # Run PostgreSQL in Docker (persistent volume)
@@ -124,21 +141,19 @@ FastAPI returns a JSON response to the client
 
 ```markdown
 ## Project Structure
-```
+```mermaid
 graph TD
     A[fastapi-task-automation/] --> B[app/]
-    B --> C[__init__.py]
-    B --> D[main.py]
-    B --> E[database.py]
-    B --> F[models.py]
-    B --> G[schemas.py]
-    B --> H[crud.py]
-    B --> I[routers/tasks.py]
-    A --> J[alembic.ini]
-    A --> K[alembic/]
-    A --> L[.env]
-    A --> M[requirements.txt]
-
+    B --> C[main.py<br><sub>includes /health endpoint</sub>]
+    B --> D[database.py<br><sub>loads DATABASE_URL from .env</sub>]
+    B --> E[... other modules]
+    A --> F[docker-compose.yml<br><sub>FastAPI + Postgres + pgAdmin (+ healthchecks)</sub>]
+    A --> G[Dockerfile<br><sub>FastAPI image definition</sub>]
+    A --> H[start.sh<br><sub>runs Alembic migrations → starts Uvicorn</sub>]
+    A --> I[.env<br><sub>contains secrets (ignored by Git)</sub>]
+    A --> J[.gitignore<br><sub>ensures .env not committed</sub>]
+    A --> K[pg_data/<br><sub>Docker-managed PostgreSQL volume</sub>]
+```
 ## Dependencies
 fastapi
 uvicorn
