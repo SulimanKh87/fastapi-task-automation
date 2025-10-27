@@ -193,6 +193,7 @@ flowchart TD
 
 ```markdown
 ## API Workflow Overview
+
 ```mermaid
 sequenceDiagram
     participant Client
