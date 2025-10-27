@@ -87,6 +87,22 @@ curl -X POST http://localhost:8000/auth/login \
 3. Access protected route
 curl -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
   http://localhost:8000/users/me
+### ⚙️ Day 4 Commands Summary
+```bash
+# Rebuild environment
+docker compose down -v
+docker compose up -d --build
+
+# Enter FastAPI container
+docker exec -it fastapi-task-api bash
+
+# Run Alembic migrations
+alembic revision --autogenerate -m "Link Task to User"
+alembic upgrade head
+
+# Verify database schema inside PostgreSQL
+docker exec -it pg-fastapi bash
+psql -U task_user -d task_db -c "\dt"
 
 graph TD
   A[app/] --> B[routers/auth.py]
@@ -94,8 +110,12 @@ graph TD
   A --> D[schemas.py<br><sub>add UserCreate, UserLogin, UserOut</sub>]
   A --> E[security.py<br><sub>handle hashing & JWT utils</sub>]
   A --> F[crud.py<br><sub>add user CRUD</sub>]
+  
+  Outcome
 
-
+All services now share a single Docker network (fastapi_net).
+.env securely manages credentials, and Alembic migrations create both users and tasks tables successfully.
+Authentication endpoints are tested end to end.
 ---
 
 ## ⚙ Environment Variables (.env)
