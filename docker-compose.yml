@@ -8,10 +8,8 @@ services:
     image: postgres:15
     container_name: pg-fastapi
     restart: always
-    environment:
-      POSTGRES_USER: task_user
-      POSTGRES_PASSWORD: task_password
-      POSTGRES_DB: task_db
+    env_file:
+      - .env  # ✅ Use .env for DB credentials
     volumes:
       - pgdata_fastapi:/var/lib/postgresql/data
     ports:
@@ -21,7 +19,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
-
+    networks:
+      - fastapi_net
   # -----------------------------------------------------------------
   # pgAdmin (Web UI for PostgreSQL)
   # -----------------------------------------------------------------
@@ -29,9 +28,8 @@ services:
     image: dpage/pgadmin4
     container_name: pgadmin-fastapi
     restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    env_file:
+      - .env                # ✅ Reads PGADMIN vars from .env
     depends_on:
       db:
         condition: service_healthy
@@ -39,7 +37,8 @@ services:
       - "${PGADMIN_LISTEN_PORT}:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-
+    networks:
+      - fastapi_net
 
   # -----------------------------------------------------------------
   # FastAPI Application
@@ -49,7 +48,7 @@ services:
     container_name: fastapi-task-api
     restart: always
     env_file:
-      - .env                     # loads SECRET_KEY, DB URL, etc.
+      - .env                       # ✅ Reads FastAPI vars (DB URL, SECRET_KEY, etc.) - loads SECRET_KEY, DB URL, etc.
     volumes:
       - ./:/app                  # live-reload during dev
     ports:
