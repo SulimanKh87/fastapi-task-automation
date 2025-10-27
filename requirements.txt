@@ -22,3 +22,8 @@ typing-inspection==0.4.2
 typing_extensions==4.15.0
 uvicorn==0.38.0
 wheel==0.45.1
+passlib[bcrypt]
+python-jose[cryptography]
+pydantic-settings
+email-validator
+
