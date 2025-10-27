@@ -174,6 +174,7 @@ http://127.0.0.1:8000/docs
 
 ## System Architecture
 
+```mermaid
 flowchart TD
     A["Client UI (Browser / Postman / CLI)"] --> B["FastAPI Application (app/main.py + Routes)"]
     B --> C["Business Logic Layer (CRUD, Services, Auth)"]
@@ -181,7 +182,7 @@ flowchart TD
     C --> E["Async Worker (Celery + Redis Queue)"]
     E --> F["CI/CD Pipeline (Docker + GitHub Actions)"]
     D --> F
-
+```
 
 **Key Components**
 - **FastAPI** — REST API framework (main entry point)
