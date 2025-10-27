@@ -1,50 +1,75 @@
 version: "3.9"
 
 services:
-  pg-fastapi:
-    image: postgres:16
+  # -----------------------------------------------------------------
+  # PostgreSQL Database
+  # -----------------------------------------------------------------
+  db:
+    image: postgres:15
     container_name: pg-fastapi
-    restart: unless-stopped
-    env_file:
-      - .env
-    ports:
-      - "5433:5432"
+    restart: always
+    environment:
+      POSTGRES_USER: task_user
+      POSTGRES_PASSWORD: task_password
+      POSTGRES_DB: task_db
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pgdata_fastapi:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U task_user -d task_db"]
       interval: 5s
       timeout: 3s
       retries: 10
 
-
-  # FastAPI Application
-  web:
-    build: .
-    container_name: fastapi-app
+  # -----------------------------------------------------------------
+  # pgAdmin (Web UI for PostgreSQL)
+  # -----------------------------------------------------------------
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-fastapi
     restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     depends_on:
-      pg-fastapi:
+      db:
         condition: service_healthy
+    ports:
+      - "${PGADMIN_LISTEN_PORT}:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+
+  # -----------------------------------------------------------------
+  # FastAPI Application
+  # -----------------------------------------------------------------
+  api:
+    build: .
+    container_name: fastapi-task-api
+    restart: always
     env_file:
-      - .env
+      - .env                     # loads SECRET_KEY, DB URL, etc.
+    volumes:
+      - ./:/app                  # live-reload during dev
     ports:
       - "8000:8000"
-    command: ["bash", "start.sh"]
-    volumes:
-      - .:/code
-
-  # 🧩 Add this new pgAdmin service below
-  pgadmin:
-    image: dpage/pgadmin4:8
-    container_name: pgadmin
-    restart: unless-stopped
-    env_file:
-      - .env # this file contains PGADMIN_DEFAULT_EMAIL and PGADMIN_DEFAULT_PASSWORD
-    ports:
-      - "5050:80"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
-      - pg-fastapi
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - fastapi_net
 
 volumes:
-  pg_data:
+  pgdata_fastapi:
+  pgadmin_data:
+
+networks:
+  fastapi_net:
+    driver: bridge
