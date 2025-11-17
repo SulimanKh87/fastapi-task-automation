@@ -118,6 +118,61 @@ All services now share a single Docker network (fastapi_net).
 Authentication endpoints are tested end to end.
 ---
 
+Day 4.1 — Enforcing User–Task Ownership
+🔒 User–Task Ownership (Day 4 Finalization)
+To secure task operations, each task is now linked to the authenticated user via owner_id.
+
+✔ Changes Implemented
+Added owner_id to Task model and Pydantic schema
+Updated CRUD logic to restrict:
+reading a task
+updating a task
+deleting a task
+→ only if the task belongs to the authenticated user
+Added full /tasks/{id} routes with ownership validation
+Updated Alembic migration (Link Task to User)
+
+✔ Behavior
+Users only see their own tasks
+Users cannot read/modify/delete tasks created by others
+Attempting to access a foreign task returns 404 Task not found
+
+🧪 Example
+User A creates Task #1 → owner_id = A
+User B requests /tasks/1 → returns 404
+
+This completes Day 4 requirements.
+------------------------------------
+Day 5 — Branching, Ownership Enforcement & Code Hardening
+Goal
+
+Finalize the user–task authorization layer and prepare the project for Pytest & CI
+
+Achievements
+Created branch feature/task-user-ownership
+Added owner_id to Task schema (schemas.py)
+
+Completed secure CRUD:
+get_task_by_id_and_user
+update_task_for_user
+delete_task_for_user
+
+Completed full Task API routes:
+GET /tasks/{id}
+PUT /tasks/{id}
+DELETE /tasks/{id}
+Verified that a user can only interact with their own tasks
+
+Validation Commands
+# Create user A
+POST /auth/signup
+# Login user A
+POST /auth/login
+# Create a task as A
+POST /tasks
+# Login user B → B must NOT access A’s task
+GET /tasks/1  → 404
+
 ## ⚙ Environment Variables (.env)
 # Security
 SECRET_KEY=change_me_to_a_long_random_secure_string
